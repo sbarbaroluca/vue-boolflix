@@ -1,15 +1,28 @@
 <template>
   <div id="app">
-    <Header />
+    <Header @passoQuery="salvoQuery" />
+    <Main :queryString="queryString" />
   </div>
 </template>
 
 <script>
 import Header from "./components/Header";
+import Main from "./components/Main";
 export default {
   name: "App",
   components: {
-    Header
+    Header,
+    Main
+  },
+  data() {
+    return {
+      queryString: ""
+    };
+  },
+  methods: {
+    salvoQuery(queryString) {
+      this.queryString = queryString;
+    }
   }
 };
 </script>
