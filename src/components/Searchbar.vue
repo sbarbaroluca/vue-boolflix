@@ -5,7 +5,7 @@
       </div>
       <div class="col-auto">
         <button type="submit" class="btn btn-primary" @click.prevent="$emit('passoQuery', queryString)">
-          BAMBINI
+          Ricerca
         </button>  
       </div>
   </from>
