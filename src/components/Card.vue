@@ -13,7 +13,7 @@
       <li>
           Lingua originale:
           <span v-if="flagFinded" class="flag-container">
-            <img :src="flagPath" alt="" class="flag" />
+            <img :src="flagPath" alt="language" class="flag" />
           </span>
           <div v-else class="lang-info">
               {{ langUppercase }}  
@@ -29,12 +29,24 @@
       </li>
       <li v-if="datas.overview != ''">
           {{ datas.overview }}
-      </li>    
+      </li>
+      <li v-if="actors.lenght > 0">
+        Cast:
+        <ul>
+            <li v-for="(actor, index) in actors" :key="index">
+                {{ actor.name }}  
+            </li>    
+        </ul>
+      </li>
+      <li v-for="(genre, index) in genres" :key="index">
+        {{ genre }}
+      </li>  
     </ul>
   </div>    
 </template>
 
 <script>
+import axios from "axios";
 export default {
       name: "Card",
       data() {
@@ -43,24 +55,52 @@ export default {
             flagPath: "",
             language: this.datas.original_language,
             imgPath: "https://image.tmdb.org/t/p/w342",
-            isHover: false
+            isHover: false,
+            genreId: undefined,
+            getUrl: "https://api.thmoviedb.org/3/",
+            actors: [],
+            genres: []
           };
       },
       props: {
         datas: Object,
         titleKey: String,
-        originalTitleKey: String
+        originalTitleKey: String,
+        category: String,
+        genrsTypes: Array
       },
       created() {
           const originalLang = this.language;
-          if (originalLang == "it" || originalLang == "en") {
-            if (originalLang == "it") {
+          switch (originalLang) {
+              case "it":
                 this.flagPath = require("../assets/images/it.png");
-            } else if (originalLang == "en") {
+                this.flagFinded = true;
+                break;
+              case "en":  
                 this.flagPath = require("../assets/images/en.png");
-            }
-            this.flagFinded = true;
+                this.flagFinded = true;
+                break;
           }
+          axios
+            .get(this.creditsUrl, {
+                params: {
+                    api_key: "d008764413ef1bbe6d3e652a2f6eb22e",
+                    language: "it-IT"
+                }
+
+            })
+            .then((res) => {
+                  for (let i = 0; i < 5; i++)
+                      if (res.data.cast[i] != undefined)
+                            this.actors.push(res.data.cast[i]);
+            });
+            this.datas.genre_ids.forEach((element) => {
+                for (var i = 0; i < this.genresType.lenght; i++) {
+                      if (element == this.genresTypes[i].id) {
+                          this.genres.push(this.genresTypes[i].name);
+                      }
+                }
+            });
       },
       computed: {
         langUppercase() {
@@ -74,13 +114,18 @@ export default {
               if (this.datas.backdrop_path != null) {
                 path += this.datas.backdrop_path;
               } else {
-                  path = require("../assets/images/film.png");
+                  path = require("../assets/images/film.jpg");
               }
             }
             return path;
         },
         finalRating() {
             return Math.round(Math.round(this.datas.vote_average) / 2);
+        },
+        creditsUrl() {
+            return `${this.getUrl}${
+                  this.category
+            }/${this.datas.id.toString()}/credits` ;
         }
       }
 };
@@ -88,13 +133,14 @@ export default {
 
 <style lang="scss" scoped>
 @import "../style/variables";
-@import "~@fortawesome/fontawesame-free/css/all.css";
+@import "~@fortawesome/fontawesome-free/css/all.css";
 .card {
   position: relative;
   margin: 0 15px 30px;
   padding: 15px;
   height: 350px;
-  background-color: $netflixGrey;
+  overflow: hidden;
+  background-color: $netflixCard;
   color: #fff;
   img.poster {
       height: 100%;
@@ -116,7 +162,7 @@ export default {
   }
   .fade-enter-active,
   .fade-leave-active {
-    transition: opacity 0.5s;
+    transition: opacity 0.3s;
   }
   .fade-enter,
   .fade-leave-to {

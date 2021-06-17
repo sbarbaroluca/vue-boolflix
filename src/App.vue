@@ -1,7 +1,18 @@
 <template>
   <div id="app">
-    <Header @passoQuery="salvoQuery" />
-    <Main :queryString="queryString" />
+    <Header 
+    @genereSerieSelezionato="salvoGenereSerieSelezionato"
+    @genereFilmSelezionato="salvoGenereFilmSelezionato"
+    @passoQuery="salvoQuery" 
+    :moviesGenre="moviesGenre"
+    :seriesGenre="seriesGenre"
+    />
+    <Main 
+    :queryString="queryString" 
+    @passoGeneri="salvoGeneri"
+    :genereSerieSelezionato="genereSerieSelezionato"
+    :genereFilmSelezionato="genereFilmSelezionato"
+    />
   </div>
 </template>
 
@@ -16,12 +27,30 @@ export default {
   },
   data() {
     return {
-      queryString: ""
+      queryString: "",
+      moviesGenre: [],
+      seriesGenre: [],
+      genereFilmSelezionato: undefined,
+      genereSerieSelezionato: undefined
     };
   },
   methods: {
     salvoQuery(queryString) {
       this.queryString = queryString;
+    },
+    salvoGeneri(moviesGenre, seriesGenre) {
+        moviesGenre.forEach((element) => {
+            this.moviesGenre.push(element);
+        });
+        seriesGenre.forEach((element) => {
+            this.seriesGenre.push(element);
+        });
+    },
+    salvoGenereSerieSelezionato(genereSelezionato) {
+          this.genereSerieSelezionato = parseInt(genereSelezionato);
+    },
+    salvoGenereFilmSelezionato(genereSelezionato) {
+          this.genereFilmSelezionato = parseInt(genereSelezionato);
     }
   }
 };
